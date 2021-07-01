@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.WeatherFragment">
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/editLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/where_you_city"
+        android:layout_margin="@dimen/margin_into_container"
+        app:boxCornerRadiusBottomEnd="@dimen/corner_radius_layout"
+        app:boxCornerRadiusBottomStart="@dimen/corner_radius_layout"
+        app:boxCornerRadiusTopEnd="@dimen/corner_radius_layout"
+        app:boxCornerRadiusTopStart="@dimen/corner_radius_layout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+        app:startIconDrawable="@drawable/ic_baseline_search_24"
+        app:endIconDrawable="@drawable/ic_baseline_my_location_24"
+        app:boxBackgroundColor="@color/background_text_layout"
+        app:boxStrokeColor="@color/transparent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etCityName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/weatherContainer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_weather_container"
+        app:cardCornerRadius="@dimen/corner_radius_layout"
+        android:layout_margin="@dimen/margin_into_container"
+        android:backgroundTint="@color/background_weather_container"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iconWeather"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="fitCenter"
+                android:layout_margin="@dimen/margin_into_container"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="@id/third_part_guidline" />
+
+
+            <TextView
+                android:id="@+id/tvTemperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                tools:text="46"
+                android:layout_marginTop="@dimen/margin_into_container"
+                android:layout_marginStart="@dimen/margin_into_container"
+                app:layout_constraintTop_toTopOf="@id/iconWeather"
+                app:layout_constraintLeft_toRightOf="@id/iconWeather"
+                app:layout_constraintBottom_toTopOf="@id/tvStateWeather" />
+
+            <TextView
+                android:id="@+id/tvStateWeather"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_weather"
+                android:layout_marginBottom="@dimen/margin_into_container"
+                android:layout_marginStart="@dimen/margin_into_container"
+                app:layout_constraintTop_toBottomOf="@id/tvTemperature"
+                app:layout_constraintLeft_toRightOf="@id/iconWeather"
+                app:layout_constraintBottom_toTopOf="@+id/tvCityName"
+                tools:text="Пасмурно" />
+
+            <TextView
+                android:id="@+id/tvCityName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/main_text_weather"
+                android:layout_marginBottom="@dimen/margin_into_container"
+                android:layout_marginStart="@dimen/margin_into_container"
+                app:layout_constraintBottom_toBottomOf="@+id/iconWeather"
+                app:layout_constraintLeft_toRightOf="@id/iconWeather"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvStateWeather" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/third_part_guidline"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.33"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/labelFeelLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ощущается как "
+        android:textSize="@dimen/main_text_weather"
+        android:layout_margin="@dimen/margin_into_container"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weatherContainer" />
+
+    <TextView
+        android:id="@+id/tvFFeelLike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="12"
+        android:textStyle="bold"
+        android:textSize="@dimen/main_text_weather"
+        android:layout_marginStart="@dimen/margin_into_container"
+        app:layout_constraintLeft_toRightOf="@id/labelFeelLike"
+        app:layout_constraintTop_toTopOf="@id/labelFeelLike" />
+
+
+    <TextView
+        android:id="@+id/labelTemperatureInterval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Температура в течении дня"
+        android:textSize="@dimen/main_text_weather"
+        android:layout_margin="@dimen/margin_into_container"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/labelFeelLike" />
+
+    <TextView
+        android:id="@+id/tvTempInterval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="12-22"
+        android:textStyle="bold"
+        android:textSize="@dimen/main_text_weather"
+        android:layout_marginStart="@dimen/margin_into_container"
+        app:layout_constraintLeft_toRightOf="@id/labelTemperatureInterval"
+        app:layout_constraintTop_toTopOf="@id/labelTemperatureInterval" />
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/advancedWeatherContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="@dimen/corner_radius_layout"
+        android:layout_marginBottom="@dimen/margin_into_container"
+        app:layout_constraintLeft_toLeftOf="@id/weatherContainer"
+        app:layout_constraintRight_toRightOf="@id/weatherContainer"
+        app:layout_constraintBottom_toBottomOf="parent">
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

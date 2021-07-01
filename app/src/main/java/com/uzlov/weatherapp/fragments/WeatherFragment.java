@@ -6,22 +6,21 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.uzlov.weatherapp.BuildConfig;
-import com.uzlov.weatherapp.R;
-import com.uzlov.weatherapp.RemoteRepositoryImpl;
+import com.uzlov.weatherapp.databinding.FragmentWeatherBinding;
 import com.uzlov.weatherapp.model.ResponseWeather;
+import com.uzlov.weatherapp.server.Constants;
 import com.uzlov.weatherapp.services.LocationService;
 import com.uzlov.weatherapp.viewmodel.WeatherViewModel;
 
@@ -32,6 +31,7 @@ public class WeatherFragment extends Fragment {
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 100;
     private LocationService locationService;
     private WeatherViewModel weatherViewModel;
+    private FragmentWeatherBinding viewBinding;
 
     public WeatherFragment() {}
 
@@ -42,30 +42,10 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         weatherViewModel =  new ViewModelProvider(this).get(WeatherViewModel.class);
 
         // запрашиваем разрешение на ГЕО если необходимо
         if (!checkPermissions()) requestLocationPermission();
-
-        // создание сервиса для получения координат, TODO() применить koin в будущем
-        locationService = new LocationService(requireContext(), location -> {
-            // callback  получения погоды
-            weatherViewModel.getWeatherByLatLng(location.getLatitude(), location.getLongitude()).observe(getViewLifecycleOwner(), this::updateUI);
-
-        });
-
-        locationService.startUpdatesButtonHandler();
-        LocationSettingsRequest settingRequest = locationService.buildLocationSettingsRequest();
-        locationService.getMSettings().checkLocationSettings(settingRequest).addOnSuccessListener(locationSettingsResponse -> {
-            locationService.requestLocationUpdates();
-        })
-                .addOnFailureListener(e -> requestLocationPermission());
-
-    }
-
-    private void updateUI(ResponseWeather responseWeather) {
-
     }
 
     private boolean checkPermissions() {
@@ -112,18 +92,40 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_weather, container, false);
+        viewBinding =  FragmentWeatherBinding.inflate(getLayoutInflater(), container, false);
+        return viewBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NotNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RemoteRepositoryImpl.INSTANCE.loadWeatherByLatLng(55.75697, 37.61502).observe(getViewLifecycleOwner(), (responseWeather) -> {
-            Log.e("TAG", responseWeather.getName());
-            TextView tv = view.findViewById(R.id.tvTest);
-            tv.setText(responseWeather.getName());
+
+        // создание сервиса для получения координат, TODO() применить koin в будущем
+        locationService = new LocationService(requireContext(), location -> {
+            // callback  получения погоды
+            weatherViewModel.getWeatherByLatLng(location.getLatitude(), location.getLongitude()).observe(getViewLifecycleOwner(), this::updateUI);
+
         });
 
+        locationService.startUpdatesButtonHandler();
+        LocationSettingsRequest settingRequest = locationService.buildLocationSettingsRequest();
+        locationService.getMSettings().checkLocationSettings(settingRequest).addOnSuccessListener(locationSettingsResponse -> {
+            locationService.requestLocationUpdates();
+        })
+                .addOnFailureListener(e -> requestLocationPermission());
+    }
+
+    private void updateUI(ResponseWeather responseWeather) {
+        if (responseWeather.getWeather().isEmpty()) return;
+        viewBinding.tvStateWeather.setText(responseWeather.getWeather().get(0).getDescription());
+        viewBinding.tvTemperature.setText(responseWeather.getMain().getTemp() + " \u2103");
+        viewBinding.tvCityName.setText(responseWeather.getName() + ", " + responseWeather.getSys().getCountry());
+        viewBinding.tvTempInterval.setText(responseWeather.getMain().getTemp_min() + "\u2103 - " + responseWeather.getMain().getTemp_max()+"\u2103");
+        viewBinding.tvFFeelLike.setText(String.valueOf(responseWeather.getMain().getFeels_like() + "\u2103"));
+
+        Glide.with(requireContext())
+                .load(Constants.INSTANCE.getBASE_URL_IMAGE() + responseWeather.getWeather().get(0).getIcon()+"@4x.png")
+                .into(viewBinding.iconWeather);
     }
 
     @Override
