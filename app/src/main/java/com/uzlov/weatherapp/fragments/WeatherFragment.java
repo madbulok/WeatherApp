@@ -15,12 +15,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.uzlov.weatherapp.BuildConfig;
 import com.uzlov.weatherapp.R;
 import com.uzlov.weatherapp.RemoteRepositoryImpl;
+import com.uzlov.weatherapp.model.ResponseWeather;
 import com.uzlov.weatherapp.services.LocationService;
+import com.uzlov.weatherapp.viewmodel.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,10 +31,9 @@ public class WeatherFragment extends Fragment {
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 100;
     private LocationService locationService;
+    private WeatherViewModel weatherViewModel;
 
-    public WeatherFragment() {
-
-    }
+    public WeatherFragment() {}
 
     public static WeatherFragment newInstance() {
         return new WeatherFragment();
@@ -41,19 +43,28 @@ public class WeatherFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        weatherViewModel =  new ViewModelProvider(this).get(WeatherViewModel.class);
+
         // запрашиваем разрешение на ГЕО если необходимо
         if (!checkPermissions()) requestLocationPermission();
 
         // создание сервиса для получения координат, TODO() применить koin в будущем
-        locationService = new LocationService(requireContext(), location -> Log.e("TAG", String.valueOf(location.getLatitude())));
+        locationService = new LocationService(requireContext(), location -> {
+            // callback  получения погоды
+            weatherViewModel.getWeatherByLatLng(location.getLatitude(), location.getLongitude()).observe(getViewLifecycleOwner(), this::updateUI);
+
+        });
+
         locationService.startUpdatesButtonHandler();
         LocationSettingsRequest settingRequest = locationService.buildLocationSettingsRequest();
         locationService.getMSettings().checkLocationSettings(settingRequest).addOnSuccessListener(locationSettingsResponse -> {
             locationService.requestLocationUpdates();
         })
-                .addOnFailureListener(e -> {
-                    Log.e("TAG", e.getMessage());
-                });
+                .addOnFailureListener(e -> requestLocationPermission());
+
+    }
+
+    private void updateUI(ResponseWeather responseWeather) {
 
     }
 
@@ -77,6 +88,8 @@ public class WeatherFragment extends Fragment {
                     requireActivity(), arr,
                     REQUEST_PERMISSIONS_REQUEST_CODE
             );
+        } else {
+            locationService.startUpdatesButtonHandler();
         }
     }
 
