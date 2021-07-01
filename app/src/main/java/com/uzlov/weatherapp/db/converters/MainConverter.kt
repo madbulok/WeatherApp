@@ -2,11 +2,12 @@ package com.uzlov.weatherapp.db.converters
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import com.uzlov.weatherapp.model.Clouds
-import com.uzlov.weatherapp.model.Main
-import com.uzlov.weatherapp.model.Sys
+import com.google.gson.reflect.TypeToken
+import com.uzlov.weatherapp.model.*
 
 class MainConverter {
+
+    // for Main
     @TypeConverter
     fun fromMain(main: Main): String {
         return Gson().toJson(main)
@@ -28,7 +29,6 @@ class MainConverter {
         return Gson().fromJson(clouds, Clouds::class.java)
     }
 
-
     // for Sys object
     @TypeConverter
     fun fromSys(sys: Sys): String {
@@ -38,5 +38,29 @@ class MainConverter {
     @TypeConverter
     fun toSys(sys: String) : Sys{
         return Gson().fromJson(sys, Sys::class.java)
+    }
+
+    // for Wind object
+    @TypeConverter
+    fun fromWind(wind: Wind): String {
+        return Gson().toJson(wind)
+    }
+
+    @TypeConverter
+    fun toWind(wind: String) : Wind{
+        return Gson().fromJson(wind, Wind::class.java)
+    }
+
+
+    // for Wind object
+    @TypeConverter
+    fun fromWeather(weathers: List<Weather>): String {
+        return Gson().toJson(weathers)
+    }
+
+    @TypeConverter
+    fun toWeather(weathers: String) : List<Weather>{
+        val type = object : TypeToken<List<Weather>>() {}.type
+        return Gson().fromJson(weathers, type)
     }
 }
