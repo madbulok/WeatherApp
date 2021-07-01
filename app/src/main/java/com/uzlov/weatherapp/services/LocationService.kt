@@ -13,8 +13,6 @@ public class LocationService(
     @NonNull val context: Context,
     var locationListener: LocationListener?
 ) {
-
-
     private var UPDATE_INTERVAL_IN_MILLISECONDS: Long = 5000
     private val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2
 
@@ -27,7 +25,6 @@ public class LocationService(
     private var mRequestingLocationUpdates: Boolean = false
 
     init {
-
         mRequestingLocationUpdates = false
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -37,11 +34,8 @@ public class LocationService(
         createLocationRequest()
     }
 
-
     private fun createLocationRequest() {
-        mLocationRequest = LocationRequest()
-
-        mLocationRequest.apply {
+        mLocationRequest = LocationRequest().apply {
             interval = UPDATE_INTERVAL_IN_MILLISECONDS
             fastestInterval = FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -84,7 +78,6 @@ public class LocationService(
             mLocationCallback, Looper.myLooper()
         )
     }
-
 
     fun startUpdatesButtonHandler() {
         if (!mRequestingLocationUpdates) {

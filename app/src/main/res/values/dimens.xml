@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_into_container">6dp</dimen>
+    <dimen name="corner_radius_layout">8dp</dimen>
+    <dimen name="height_weather_container">150dp</dimen>
+    <dimen name="main_text_weather">18sp</dimen>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_weather_container">#29B6F6</color>
+    <color name="background_text_layout">#C7C7C7</color>
+</resources>
