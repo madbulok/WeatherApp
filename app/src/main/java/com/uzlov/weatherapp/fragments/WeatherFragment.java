@@ -120,8 +120,11 @@ public class WeatherFragment extends Fragment {
         viewBinding.tvStateWeather.setText(responseWeather.getWeather().get(0).getDescription());
         viewBinding.tvTemperature.setText(responseWeather.getMain().getTemp() + " \u2103");
         viewBinding.tvCityName.setText(responseWeather.getName() + ", " + responseWeather.getSys().getCountry());
-        viewBinding.tvTempInterval.setText(responseWeather.getMain().getTemp_min() + "\u2103 - " + responseWeather.getMain().getTemp_max()+"\u2103");
-        viewBinding.tvFFeelLike.setText(String.valueOf(responseWeather.getMain().getFeels_like() + "\u2103"));
+        viewBinding.tvTempMinLike.setText(responseWeather.getMain().getTemp_min() + " \u2103");
+        viewBinding.tvTempMaxLike.setText(responseWeather.getMain().getTemp_max()+" \u2103");
+        viewBinding.tvFeelLike.setText(responseWeather.getMain().getFeels_like() + " \u2103");
+        viewBinding.tvWindSpeed.setText(responseWeather.getWind().getSpeed() + " m/s");
+//        viewBinding.tvWindTemp.setText(responseWeather.getWind().getDeg() + " \u2103");
 
         Glide.with(requireContext())
                 .load(Constants.INSTANCE.getBASE_URL_IMAGE() + responseWeather.getWeather().get(0).getIcon()+"@4x.png")
