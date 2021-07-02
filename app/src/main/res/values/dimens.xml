@@ -3,5 +3,7 @@
     <dimen name="margin_into_container">6dp</dimen>
     <dimen name="corner_radius_layout">8dp</dimen>
     <dimen name="height_weather_container">150dp</dimen>
-    <dimen name="main_text_weather">18sp</dimen>
+    <dimen name="main_text_weather">16sp</dimen>
+    <dimen name="size_text_main_temperature">40sp</dimen>
+    <dimen name="margin_main_container">16dp</dimen>
 </resources>

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="where_you_city">Какой ваш город?</string>
+    <string name="feeling_like">Ощущается</string>
+    <string name="label_minimal">Минимальная</string>
+    <string name="label_maximum">Максимальная</string>
+    <string name="label_wind">Ветер</string>
+    <string name="label_cloud">Облачность</string>
+    <string name="label_rain">Дождь</string>
 </resources>
