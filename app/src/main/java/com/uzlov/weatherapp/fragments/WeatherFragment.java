@@ -13,27 +13,37 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.uzlov.weatherapp.BuildConfig;
 import com.uzlov.weatherapp.databinding.FragmentWeatherBinding;
 import com.uzlov.weatherapp.model.ResponseWeather;
+import com.uzlov.weatherapp.repository.LocalRepositoryImpl;
 import com.uzlov.weatherapp.server.Constants;
 import com.uzlov.weatherapp.services.LocationService;
 import com.uzlov.weatherapp.viewmodel.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import kotlin.Lazy;
+import static org.koin.java.KoinJavaComponent.inject;
+
+
 public class WeatherFragment extends Fragment {
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 100;
     private LocationService locationService;
-    private WeatherViewModel weatherViewModel;
+    private final Lazy<WeatherViewModel> weatherViewModel = inject(WeatherViewModel.class);
+
+
     private FragmentWeatherBinding viewBinding;
 
-    public WeatherFragment() {}
+    public WeatherFragment() {
+    }
 
     public static WeatherFragment newInstance() {
         return new WeatherFragment();
@@ -42,7 +52,6 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        weatherViewModel =  new ViewModelProvider(this).get(WeatherViewModel.class);
 
         // запрашиваем разрешение на ГЕО если необходимо
         if (!checkPermissions()) requestLocationPermission();
@@ -78,6 +87,7 @@ public class WeatherFragment extends Fragment {
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationService.requestLocationUpdates();
+                locationService.startUpdatesButtonHandler();
             } else {
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -92,7 +102,7 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        viewBinding =  FragmentWeatherBinding.inflate(getLayoutInflater(), container, false);
+        viewBinding = FragmentWeatherBinding.inflate(getLayoutInflater(), container, false);
         return viewBinding.getRoot();
     }
 
@@ -103,8 +113,10 @@ public class WeatherFragment extends Fragment {
         // создание сервиса для получения координат, TODO() применить koin в будущем
         locationService = new LocationService(requireContext(), location -> {
             // callback  получения погоды
-            weatherViewModel.getWeatherByLatLng(location.getLatitude(), location.getLongitude()).observe(getViewLifecycleOwner(), this::updateUI);
-
+            weatherViewModel.getValue().getWeatherByLatLng(location.getLatitude(), location.getLongitude()).observe(getViewLifecycleOwner(), response -> {
+                LocalRepositoryImpl.INSTANCE.insertWeather(response);
+                updateUI(response);
+            });
         });
 
         locationService.startUpdatesButtonHandler();
@@ -121,13 +133,21 @@ public class WeatherFragment extends Fragment {
         viewBinding.tvTemperature.setText(responseWeather.getMain().getTemp() + " \u2103");
         viewBinding.tvCityName.setText(responseWeather.getName() + ", " + responseWeather.getSys().getCountry());
         viewBinding.tvTempMinLike.setText(responseWeather.getMain().getTemp_min() + " \u2103");
-        viewBinding.tvTempMaxLike.setText(responseWeather.getMain().getTemp_max()+" \u2103");
+        viewBinding.tvTempMaxLike.setText(responseWeather.getMain().getTemp_max() + " \u2103");
         viewBinding.tvFeelLike.setText(responseWeather.getMain().getFeels_like() + " \u2103");
         viewBinding.tvWindSpeed.setText(responseWeather.getWind().getSpeed() + " m/s");
+        viewBinding.tvCloud.setText(responseWeather.getClouds().getAll() + "%");
+
+        Date dateSunrise = new Date(responseWeather.getSys().getSunrise());
+        SimpleDateFormat formmater = new SimpleDateFormat("hh:mm", Locale.getDefault());
+        viewBinding.tvSunrise.setText(formmater.format(dateSunrise));
+
+        Date dateSunset = new Date(responseWeather.getSys().getSunset());
+        viewBinding.tvSunset.setText(formmater.format(dateSunset));
 //        viewBinding.tvWindTemp.setText(responseWeather.getWind().getDeg() + " \u2103");
 
         Glide.with(requireContext())
-                .load(Constants.INSTANCE.getBASE_URL_IMAGE() + responseWeather.getWeather().get(0).getIcon()+"@4x.png")
+                .load(Constants.INSTANCE.getBASE_URL_IMAGE() + responseWeather.getWeather().get(0).getIcon() + "@4x.png")
                 .into(viewBinding.iconWeather);
     }
 
